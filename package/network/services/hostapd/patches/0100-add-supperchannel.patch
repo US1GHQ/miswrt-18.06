@@ -1,0 +1,177 @@
+diff --git a/src/ap/ieee802_11_ht.c b/src/ap/ieee802_11_ht.c
+index 214855d..c8640e8 100644
+--- a/src/ap/ieee802_11_ht.c
++++ b/src/ap/ieee802_11_ht.c
+@@ -203,6 +203,8 @@
+ 	int pri_freq, sec_freq;
+ 	int affected_start, affected_end;
+ 	int pri = 2407 + 5 * channel;
++    //int pri = 1127 + 5 * channel;
++    //int pri = 2437 + 5 * channel;
+ 
+ 	if (iface->current_mode->mode != HOSTAPD_MODE_IEEE80211G)
+ 		return 1;
+diff --git a/src/common/ieee802_11_common.c b/src/common/ieee802_11_common.c
+index f04e77f..c87f6cd 100644
+--- a/src/common/ieee802_11_common.c
++++ b/src/common/ieee802_11_common.c
+@@ -752,6 +752,46 @@
+ 		return HOSTAPD_MODE_IEEE80211G;
+ 	}
+ 
++	if (freq >= 2192 && freq <= 2402) {
++		if ((freq - 1127) % 5)
++			return NUM_HOSTAPD_MODES;
++
++		if (vht)
++			return NUM_HOSTAPD_MODES;
++
++		/* 2.407 GHz, channels 1..13 */
++		if (sec_channel == 1)
++			*op_class = 83;
++		else if (sec_channel == -1)
++			*op_class = 84;
++		else
++			*op_class = 81;
++
++		*channel = (freq - 1127) / 5;
++
++		return HOSTAPD_MODE_IEEE80211G;
++	}
++
++    if (freq >= 2512 && freq <= 2727) {
++		if ((freq - 2437) % 5)
++			return NUM_HOSTAPD_MODES;
++
++		if (vht)
++			return NUM_HOSTAPD_MODES;
++
++		/* 2.407 GHz, channels 1..13 */
++		if (sec_channel == 1)
++			*op_class = 83;
++		else if (sec_channel == -1)
++			*op_class = 84;
++		else
++			*op_class = 81;
++
++		*channel = (freq - 2437) / 5;
++
++		return HOSTAPD_MODE_IEEE80211G;
++	}
++
+ 	if (freq == 2484) {
+ 		if (sec_channel || vht)
+ 			return NUM_HOSTAPD_MODES;
+@@ -930,6 +970,12 @@
+ 		if (chan < 1 || chan > 11)
+ 			return -1;
+ 		return 2407 + 5 * chan;
++		if (chan < 213 || chan > 255)
++			return -1;
++		return 1127 + 5 * chan;
++		if (chan < 15|| chan > 57)
++			return -1;
++		return 2437 + 5 * chan;
+ 	case 1: /* channels 36,40,44,48 */
+ 	case 2: /* channels 52,56,60,64; dfs */
+ 	case 22: /* channels 36,44; 40 MHz */
+@@ -974,6 +1020,12 @@
+ 		if (chan < 1 || chan > 13)
+ 			return -1;
+ 		return 2407 + 5 * chan;
++		if (chan < 213 || chan > 255)
++			return -1;
++		return 1127 + 5 * chan;
++		if (chan < 15|| chan > 57)
++			return -1;
++		return 2437 + 5 * chan;
+ 	case 1: /* channels 36,40,44,48 */
+ 	case 2: /* channels 52,56,60,64; dfs */
+ 	case 5: /* channels 36,44; 40 MHz */
+@@ -1012,6 +1064,12 @@
+ 		if (chan < 1 || chan > 13)
+ 			return -1;
+ 		return 2407 + 5 * chan;
++		if (chan < 213 || chan > 255)
++			return -1;
++		return 1127 + 5 * chan;
++		if (chan < 15|| chan > 57)
++			return -1;
++		return 2437 + 5 * chan;
+ 	case 31: /* channel 14 */
+ 		if (chan != 14)
+ 			return -1;
+@@ -1056,6 +1114,12 @@
+ 		if (chan < 1 || chan > 13)
+ 			return -1;
+ 		return 2407 + 5 * chan;
++		if (chan < 213 || chan > 255)
++			return -1;
++		return 1127 + 5 * chan;
++		if (chan < 15|| chan > 57)
++			return -1;
++		return 2437 + 5 * chan;
+ 	case 1: /* channels 36,40,44,48 */
+ 	case 2: /* channels 52,56,60,64; dfs */
+ 	case 4: /* channels 36,44; 40 MHz */
+@@ -1082,6 +1146,12 @@
+ 		if (chan < 1 || chan > 13)
+ 			return -1;
+ 		return 2407 + 5 * chan;
++		if (chan < 213 || chan > 255)
++			return -1;
++		return 1127 + 5 * chan;
++		if (chan < 15|| chan > 57)
++			return -1;
++		return 2437 + 5 * chan;
+ 	case 82:
+ 		/* channel 14 */
+ 		if (chan != 14)
+@@ -1092,6 +1162,12 @@
+ 		if (chan < 1 || chan > 13)
+ 			return -1;
+ 		return 2407 + 5 * chan;
++		if (chan < 213 || chan > 255)
++			return -1;
++		return 1127 + 5 * chan;
++		if (chan < 15|| chan > 57)
++			return -1;
++		return 2437 + 5 * chan;
+ 	case 115: /* channels 36,40,44,48; indoor only */
+ 	case 116: /* channels 36,44; 40 MHz; indoor only */
+ 	case 117: /* channels 40,48; 40 MHz; indoor only */
+diff --git a/wpa_supplicant/wnm_sta.c b/wpa_supplicant/wnm_sta.c
+index 28346ea..05d01a7 100644
+--- a/wpa_supplicant/wnm_sta.c
++++ b/wpa_supplicant/wnm_sta.c
+@@ -448,8 +448,12 @@
+ 		 * information. Try to determine the most likely operating
+ 		 * frequency based on the channel number.
+ 		 */
++        if (chan >= 213 && chan <= 255)
++            freq = 1127 + chan * 5;
+ 		if (chan >= 1 && chan <= 13)
+ 			freq = 2407 + chan * 5;
++        if (chan >= 15 && chan <= 60)
++            freq = 2437 + chan * 5;
+ 		else if (chan == 14)
+ 			freq = 2484;
+ 		else if (chan >= 36 && chan <= 169)
+diff --git a/wpa_supplicant/wps_supplicant.c b/wpa_supplicant/wps_supplicant.c
+index 1a2677b..60c191c 100644
+--- a/wpa_supplicant/wps_supplicant.c
++++ b/wpa_supplicant/wps_supplicant.c
+@@ -2379,9 +2379,12 @@
+ 	if (attr->ap_channel) {
+ 		u16 chan = WPA_GET_BE16(attr->ap_channel);
+ 		int freq = 0;
+-
++        if (chan >= 213 && chan <= 255)
++            freq = 1127 + chan * 5;
+ 		if (chan >= 1 && chan <= 13)
+ 			freq = 2407 + 5 * chan;
++        if (chan >= 15 && chan <= 60)
++            freq = 2437 + chan * 5;
+ 		else if (chan == 14)
+ 			freq = 2484;
+ 		else if (chan >= 30)
