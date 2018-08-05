@@ -1,0 +1,30 @@
+diff --git a/util.c b/util.c
+index 6e0ddff..2ab84c8 100644
+--- a/util.c
++++ b/util.c
+@@ -299,8 +299,12 @@
+ 	case NL80211_BAND_2GHZ:
+ 		if (chan == 14)
+ 			return 2484;
++        else if (chan >= 215 && chan <= 255)
++            return 1127 + chan * 5;
+ 		else if (chan < 14)
+ 			return 2407 + chan * 5;
++        else if (chan >= 15 && chan <= 57)
++			return 2437 + chan * 5;
+ 		break;
+ 	case NL80211_BAND_5GHZ:
+ 		if (chan >= 182 && chan <= 196)
+@@ -323,8 +327,12 @@
+ 	/* see 802.11-2007 17.3.8.3.2 and Annex J */
+ 	if (freq == 2484)
+ 		return 14;
++    else if (freq >= 2192 && freq <= 2402)
++		return (freq - 1127) / 5;
+ 	else if (freq < 2484)
+ 		return (freq - 2407) / 5;
++	else if (freq >= 2512 && freq <= 2747)
++		return (freq - 2437) / 5;
+ 	else if (freq >= 4910 && freq <= 4980)
+ 		return (freq - 4000) / 5;
+ 	else if (freq <= 45000) /* DMG band lower limit */
