@@ -5,9 +5,9 @@ MisWRT сборка основанная на последнем релизе Op
 Готовые прошивки (расширенные каналы только на 2GHz и драйвером ath9k)
 https://mis.ks.ua/cloud/index.php/s/sp5wCjp8ZJZRPZK
 
-![Main menu(https://raw.githubusercontent.com/Excalibur201010/miswrt-18.06/master/screenshots/0.png)
-![Main menu(https://raw.githubusercontent.com/Excalibur201010/miswrt-18.06/master/screenshots/1.png)
-![Main menu(https://raw.githubusercontent.com/Excalibur201010/miswrt-18.06/master/screenshots/2.png)
+![Main menu](https://raw.githubusercontent.com/Excalibur201010/miswrt-18.06/master/screenshots/0.png)
+![Main menu](https://raw.githubusercontent.com/Excalibur201010/miswrt-18.06/master/screenshots/1.png)
+![Main menu](https://raw.githubusercontent.com/Excalibur201010/miswrt-18.06/master/screenshots/2.png)
 
 Если есть желание поддержать меня, вот мои реквизиты.
 Webmoney
